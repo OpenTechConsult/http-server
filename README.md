@@ -144,3 +144,76 @@ This allows us now to pass a JavaScript object to the end function like so.
 
 JSON.stringify() needs to be called because the `end()` function expects a string so this JSON.stringify() function return the string version of the JSON object.
 
+## HTTP API and Routing
+
+Welcome back! Our current web server always responds with the same thing (our friend Isaac Newton). Normally we want our server to be a bit dynamic than this. We want him to respond differently to different type of requests depending on some logic that lives in the server, with different URL representing different types of requests.
+
+Our Node HTTP server that we are creating is an event emitter. When we are passing our callback function to the `http.createServer()` function, remember that we called it the **_request listener_**. That's because when we write this :
+
+```js
+    const server = http.createServer((req, res) => {
+        // handler function logic
+    }))
+})
+```
+
+it is a shortcut for this :
+
+```js
+    server.on('request', (req, res) => {
+        // handler function logic
+    }))
+})
+```
+
+However our server isn't giving us different events for request made against different URL.
+
+We can make a request against localhost on port 3000 and passed in any URL like (_mars_) and the very same function that request listener will respond. When we have a server that has multiple different URL that responds differently depending on which one is being requested and with what HTTP methods is being requested, in that case, we call these different URL **endpoints**. This is a term we'll here often when working with servers. Each different URL that we can hit is an endpoint that is responsible for a specific piece of functionality that is provided by the backend server. So what does it look like? How do we make different endpoints for our HTTP server? We do this by looking at the request (`req`) coming in; and specifically by checking for the `req.url` and seeing if that matches the endpoint for our functionality.
+
+```js
+    const server = http.createServer((req, res) => {
+    if (req.url === '/friends') {
+        res.writeHead(200, {
+            'Content-Type': 'application/json'
+        })
+        res.end(JSON.stringify({
+            id: 1,
+            name: 'Isaac Newton',
+        }))
+    } else if (req.url === '/messages') {
+        res.setHeader('Content-Type', 'text/html')
+        res.write('<html>')
+        res.write('<body>')
+        res.write('<ul>')
+        res.write('<li>Hello Isaac</li>')
+        res.write('<li>What are your thoughts on astronomy</li>')
+        res.write('</ul>')
+        res.write('</body>')
+        res.write('</html>')
+        res.end()
+    } else {
+        res.statusCode = 404
+        res.end()
+    }
+
+})
+```
+
+Writing out HTML in this way can get pretty tiresome pretty quickly. We will improve upon this greatly. But this demonstrate how we can send different type of contents out from our server and we don't need to set the status code because if we don't send it, it default to 200. We can test the endpoint to confirm it's working.
+
+**What's if we type in some non existing endpoint ?** We don't really get a response. What we should get though is a **404 page**. The good news is that we can this functionality without much code. Our server will tell us that the page does'nt found if none of theses endpoints match. Below is how we write the code for 404 page not found.
+
+```js
+    const server = http.createServer((req, res) => {
+        if (req.url === '/friends') {
+        // ...
+        } else if (req.url === '/messages') {
+            // ...
+        } else {
+            res.statusCode = 404
+            res.end()
+        }
+    })
+```
+
+We can test the code to see how it behaves.
