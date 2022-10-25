@@ -217,3 +217,132 @@ Writing out HTML in this way can get pretty tiresome pretty quickly. We will imp
 ```
 
 We can test the code to see how it behaves.
+
+## Parameterized URLs
+
+The code that we've written so far, which responds to two different endpoints is functional but not very realistic.
+
+When writing real life servers, we will be sending back data that coming back from some sort of database where we might have dozens of different friends. And each of those friends might have their own set of friends.
+
+In our server, we need to have the ability **to query for individual item in our collection** to be able to run queries and get the data that we need to display whatever it is that we're showing to the user.
+
+So when our data lives in a larger collection of data (e.g. a list of all our friends which is an array of many of json type like so)
+
+```js
+    const friends = [
+        {
+            id: 0,
+            name: 'Nikola Tesla',
+        },
+        {
+            id: 1,
+            name: 'Sir Isaac Newton'
+        },
+        {
+            id: 2,
+            name: 'Albert Einstein'
+        },
+    ]
+```
+
+### How do we query that data in the browser?
+
+We will pass in next to the name of the collection, the **id** of the friend that we need to get. So for the data _Sir Isaac Newton_, it will be the **id** number 1, or for _Nikola Tesla_, it will friend at id 0:
+
+```bash
+    http://localhost:3000/friends/0
+    http://localhost:3000/friends/1
+```
+
+The **id** of the friend is a parameter in our endpoint. So we'll often hear this URL a **parameterized endpoint**, or a **parameterized route**, where route is basically another way of saying endpoint. But we'll get into that more when we'll talk about **_routers_** and how they can help us organize our endpoints.
+
+### So how do we do this in our Node.js code?
+
+When we check our request URL, we need to do some sort of additional parsing. There is many ways that we can do this, but a quick one is to create an items list where we split the url that comes in (`req.url`) and we'll call the string `split` method (because `req.url` is a string) splitting it whenever we found a forward slash ('/')
+
+`const items = req.url.split('/')`
+
+Say we have a URL for our request which look like:
+
+/friends/2 . That will gives us an item array of an empty string because that is the first thing prior to the first forward slash, then the 'friends' string followed by 2
+
+> /friends/2 => ['', 'friends', 2]
+
+Now, rather checking the request URL for /friends or /messages, we can check the second item of the items array. And rather than checking if it matches '/friends', we check to see if it matches the 'friends' string. We do the same exercise to the `/messages` endpoint.
+
+Let's run the code to see if it is working as expected.
+
+Now to check that the URL is a parameterized endpoint, we'll check if the length of the array is equal to 3. If it is, we'll send back the stringify version of a friend at the specific index. Since splitting a string gives an array of string, if we wan to get the item at the 3rd index, we need to convert it to a number.
+
+```js
+    const http = require('http')
+
+const PORT = 3000
+
+const friends = [
+    {
+        id: 0,
+        name: 'Nikola Tesla',
+    },
+    {
+        id: 1,
+        name: 'Sir Isaac Newton'
+    },
+    {
+        id: 2,
+        name: 'Albert Einstein'
+    }
+]
+
+const server = http.createServer((req, res) => {
+    const items = req.url.split('/')
+    if (items[1] === 'friends') {
+        res.writeHead(200, {
+            'Content-Type': 'application/json'
+        })
+        if (items.length === 3) {
+            const friendIndex = +items[2]
+            res.end(JSON.stringify(friends[friendIndex]))
+        } else {
+            res.end(JSON.stringify(friends))
+        }
+    } else if (items[1] === 'messages') {
+        res.setHeader('Content-Type', 'text/html')
+        res.write('<html>')
+        res.write('<body>')
+        res.write('<ul>')
+        res.write('<li>Hello Isaac</li>')
+        res.write('<li>What are your thoughts on astronomy</li>')
+        res.write('</ul>')
+        res.write('</body>')
+        res.write('</html>')
+        res.end()
+    } else {
+        res.statusCode = 404
+        res.end()
+    }
+
+})
+
+server.listen(PORT, () => {
+    console.log(`Listening on ${PORT}`)
+})
+```
+
+If we test the code we can see that it works as expected.
+
+At this stage, our code is far from perfect and we don't recommend creating code like this in production. For example if we try to get an index that is not in our friend array. Let say we want to access this endpoint
+
+> http://localhost:3000/friends/4
+
+The server does not respond. The server should probably be telling us **404 Not Found** because the friend with `id` oes not exist. And we would'nt go around writing a larger server where we are hard coding the length of our URL, or the amount of parameters that we're passing in. This is rather a proof of concept. What we have demonstrated though is how even simple requests can start getting quite complicated when you need to parse the incoming request. For example to get parameters. Of course, we can improve our code here. But there needs to be a better way. This seems like code that could be written once really well as a package and reuse in most servers that deals with collections of data, like our friends.
+
+As a developer, it is reasonable to expect to have existing packages help us with these common scenarios. That feeling as a developer that a problem has been solve before is a very healthy sign. It's a sign that you might have to search an existing solution, and either use that existing solution or learn from it, so we don't spend time re-inventing the wheel where really good solutions already exist. We can instead spend time resolving problems that make our application unique. Of course when learning and exploring Node.js like we are, it often pays to look behind the scenes like we've done here. But we'll look at some frameworks that will make our life easier very soon.
+
+For now, let's finish exploring Node.js built-in way of working with HTTP. There is a couple more interesting things to learn from how Node.js does things.
+
+## Same Origin Policy
+
+Welcome back!!
+
+Before we move on, we need to understand something important. Something that affects us every when we browse the web.
