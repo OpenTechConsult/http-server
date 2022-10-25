@@ -345,4 +345,48 @@ For now, let's finish exploring Node.js built-in way of working with HTTP. There
 
 Welcome back!!
 
-Before we move on, we need to understand something important. Something that affects us every when we browse the web.
+Before we move on, we need to understand something important. Something that affects us every when we browse the web. What is it? It is the **Same Origin Policy**. This is something that will come up in our carrier as a Node.js developer. Let's take sometimes to understand this often misunderstood concept.
+Let start with what **Origin** is?
+
+When we browse the web and go to a site lik maps.google.com what we type in the browser is something like:
+
+> https://www.google.com/maps
+
+The **Origin** is a combination of three things that we see here.
+
+- **The first thing is the protocol** (_https_): which indicate how we communicate with the server at google.
+- Next up, a critical part of the Origin is the **Host**: the host tells us what server we are going to be browsing to, or which server is going to be handling our request.
+- The third part of the Origin is the **PORT**: whenever included in our request. The default **PORT** when using _https_ is port 443. When using _http_ the default is port 80.
+
+Whenever one of these three things changes, we are no longer on the same origin. We can browse to other pages at that origin. For example go from the _https://www.google.com/maps_ to _http://www.google.com/mail_ to get our emails. But we can change _www.google.com_ to _facebook.com_ and still be at the same origin. That makes a lot of sens.
+
+But we also can change the protocol. So if we go to _http://www.google.com_ and not _https://www.google.com_ the origin has still changed. The origin is the combination of these three things.
+
+Now why is any of these matters to us? Well, it because our browser and JavaScript use what's called the **"Same Origin Policy"**.
+
+The **"Same Origin Policy"** is a security feature by the browser that restricts what the browser is allowed to load when browsing pages on the Internet. We might be browsing on the computer a site like www.google.com and making requests to google servers. But the JavaScript the is running on the browser that has google's code might also potentially makes request to facebook.com. Maybe it's submitting a form to facebook or getting some data about friends. Under the **same origin policy** the browser allows requests from the same origin as the page that is first loaded in the browser. So we can be on _https://www.google.com_ and make requests to _https://www.google.com_ with the _https_ protocol. But the browser restricts request from different origin than the site that we are currently browsing. So the scenario where google.com get data about friends in facebook isn't allowed. Because that helps protect your privacy.
+
+Say we type in _www.google.com_ in our browser, and we are browsing google. A request to facebook will be denied by the browser, because it is enforcing the "Same Origin Policy".
+
+Now there is an exception. Writes that cross origin servers, so from google.com to facebook.com are often allowed, even with the same origin policy. Writes include things like POST requests, where we submit some data to the server. These are allowed because they don't risk your data from **facebook** being leaked to **google**. Our page at google.com **can write** or **send** anything to Facebook, and it's completely up to the facebook server how it responds to that request. The Facebook server knows where the request came from and what it contains. It can choose to completely ignore that request if it look like it doesn't belong. Maybe it's a request from a hacker or some other malicious site.
+
+Here is an example. Say we are on google.com search page, and we are running a search for _machine learning_. Google will recommend me a series of links based on its algorithm. Now we can easily cross origin from **google.com** to wikipedia.org just by clicking on the link referencing **Wikipedia.org** page. We didn't make the request from JavaScript so the **same origin policy** didn't restrict us. Instead we click on a link in the HTML of the **google.com** page.
+
+But if we try to instead get **Wikipedia.org** data from JavaScript, say by going to JavaScript console and using the built-in **fetch()** function that our browser has in the global `window` object. We can use the `window.fetch()` function to pass in the URL of the server we want to fetch data from.
+
+> `window.fetch('https://en.wikipedia.org)`
+
+This is now a **Cross Origin Request** because we're browsing google at the moment and we're trying to get the name page from a different domain. If we run  the program in the console, we get this error that says the following.
+
+```bash
+Access to fetch at 'https://search?ei=cx.....ps://en.wikipedia.org/'
+from origin 'https://www.google.com' has been blocked by CORS policy: 
+No 'Access-Control-Allow-Origin' header is present on the requested resource.xxxxxx
+```
+
+So by reading the error message, we need to understand what CORS is. Well there are many rules that control which kind of requests we can make with the **Same Origin Policy**. And we've seen the important one in this section. But it's not a simple policy.
+
+So when we need to talk to different servers, across different domains, it's best to make sure that we use what's called CORS (which our browser just warned us about.)
+
+So what's CORS all about? We'll find out in the next section. But what we need to understand about the "Same Origin Policy" is that the main idea behind it, is to keep users browsing the web secure while also allowing them to make the request they need to browse the Internet and visit websites which aren't trying to steal their data.
+
