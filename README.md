@@ -390,3 +390,21 @@ So when we need to talk to different servers, across different domains, it's bes
 
 So what's CORS all about? We'll find out in the next section. But what we need to understand about the "Same Origin Policy" is that the main idea behind it, is to keep users browsing the web secure while also allowing them to make the request they need to browse the Internet and visit websites which aren't trying to steal their data.
 
+### Exercise: Same Origin Policy
+
+Let's test our knowledge of the browser's **Same Origin Policy**. Let's answer three quick questions about the following scenario:
+
+Say, we're browsing a page on www.wikipedia.org. In general; will the following requests succeed or fail ?
+
+1. JavaScript **GET** request to www.bank.com
+
+    This request will **FAIL** because it's clearly a violation of the **Same Origin Policy**.
+
+2. A JavaScript **POST** request to www.bank.com
+
+    This request will **SUCCEED** because it's the exception of the Same Origin Policy. It's a write action.
+
+3. Clicking an HTML link to a video on www.bank.com
+
+    This will **SUCCEED** because it is allowed. It's not a JavaScript code trying to GET data from the bank.com site.
+
