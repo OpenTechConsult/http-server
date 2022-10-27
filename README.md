@@ -437,3 +437,22 @@ We can allow requests from any origin by using the asterisk *
 We'll often see the above statement on server under development or on website that is meant to be used by anyone.
 
 But on production, if we really want to lock down our site, it's good to explicitly set **access-control-allow-origin** to the list of domains that we know can make requests to our server.
+
+## POSTing Data to the Server
+
+Welcome back!
+
+We looked at how to use Node.js HTTP server to handle requests to get data from the server like messages or a list of friends.
+
+_But how do we handle requests that submit new data to our server?_
+
+To submit data to our server, we most often use one of two requests methods. Its usually either the POST or the PUT method. And in the majority of servers, it is almost always the POST method. Because the POST method is used to add new data, whereas the PUT method only update existing data. And we can always replace the  PUT request with DELETE to delete the old item and then POST the updated version. Some servers avoid using PUT entirely. Whether it's a good idea or not, is just often a matter of preference.
+
+_So how do we work with POST requests on the server side?_
+
+Let's see how we might add a new friend. Refer to the changes made in the index.js starting from line 22.
+
+When we handle different type of requests, we generally look at the URL (whether it's a /friends or /messages), and we combine that we the request method.
+
+We also have to read the data passed to the server which contains our new friend, and any Id or name that they have.
+Remember that the request `req` object is a readable stream. We can use a listener using the `req.on()` function listening to data event. Refer to the code in index.js from line 24. We must make to convert the raw byte `data` into string.
