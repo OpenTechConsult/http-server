@@ -408,3 +408,32 @@ Say, we're browsing a page on www.wikipedia.org. In general; will the following 
 
     This will **SUCCEED** because it is allowed. It's not a JavaScript code trying to GET data from the bank.com site.
 
+## Cross Origin Resource Sharing (CORS)
+
+So what is CORS? It stands for **Cross Origin Resource Sharing**. It's a way of relaxing these restrictions that the **Same Origin Policy** puts on us developers, so that we can make applications that potentially span many different domain and origin. Because the **Same Origin Policy** generally limits us in the browser to talking to just one origin.
+
+We'll start with an example. What does Wikipedia do for their site. Let's take a look. If we browse Wikipedia article on Machine Learning, and if we go to the developer console, under the **Network** tab, let see what happens if the page is refreshed. We can see many requests were made, just for this single article. If we scroll all the way up to the top, the first request is for the main article, getting the data that we see in front of us. But Wikipedia gets much of their media (many of the diagram and photos that its articles use) from a partner site, which is **wikimedia.org**; a different domain from **wikipedia.org**. And we can see in the Network tab of the Developer Console that a request was made to _upload.wikimedia.org_ to get a diagram of a multi layer network in png format.
+
+Wikipedia and other websites are able to make requests cross origin to wikimedia.org because it uses the **CORS** header, which we can see if we scroll down under **response headers**, we have **access-control-allow-origin** followed by an asterisk. This is a header that is set on the server which specify the origin that resource from the server, like this diagram in this request can be shared with, beyond just the same origin that this file exists on.
+
+If we don't set this **access-control-allow-origin** header, the default rules of the **Same Origin Policy** apply, and it really our own domain which can talk to our server and get any data from it.
+
+This CORS header allow us developer to allow an exception when we know requests from a different domain are safe and expected.
+
+This header is always set on the response and is controlled by the server who owns the data.
+
+Let's see what value the **access-control-allow-origin** can have.
+
+This header is optional so our first option is not to include it and follow the **Same Origin Policy** default rules.
+
+We can also specify the **access-control-allow-origin** and include a specific origin as its value.
+
+> e.g access-control-allow-origin: http://google.com/
+
+We can allow requests from any origin by using the asterisk *
+
+> e.g access-control-allow-origin: *
+
+We'll often see the above statement on server under development or on website that is meant to be used by anyone.
+
+But on production, if we really want to lock down our site, it's good to explicitly set **access-control-allow-origin** to the list of domains that we know can make requests to our server.
