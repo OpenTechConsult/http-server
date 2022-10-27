@@ -456,3 +456,19 @@ When we handle different type of requests, we generally look at the URL (whether
 
 We also have to read the data passed to the server which contains our new friend, and any Id or name that they have.
 Remember that the request `req` object is a readable stream. We can use a listener using the `req.on()` function listening to data event. Refer to the code in index.js from line 24. We must make to convert the raw byte `data` into string.
+
+
+## Requests and Responses as Streams
+
+How would we make an endpoint that echoes back the data the user passed to the request back to them.
+So if we send the data for Albert Einstein in the POST request, the response to that request will be the exact same data about Einstein. Sound simple! Is it really simple? With all those conversions that we have to do to get our data back into JSON? Will this involve more of that ?
+
+The answer lies in how  the request is a readable stream and the response a writable stream. Which means that we can **pipe** what's being read from the readable stream to the writable stream here, and the data will flow straight from the request back to the client through the response. All we have to do is take a request and pipe it to the response like so:
+
+> `req.pipe(res)`
+
+Just like in our Planets project, we had this CSV file being read as a stream, and then being piped into a CSV parser to get back the parsed rows of the CSV file. We can do the same thing with our request. So we passed in some JSON data in a readable stream and then pipe it into a writable stream (the response) to send back that same JSON back to the browser.
+
+This is the power of Node approach to using streams.We could echo the data back or we can pipe it and stream it to another server, or process it somehow as it comes in, just like we did in our Planets project and the CSV file with our lines of data, all without blocking our code.
+
+Node.js is very very good at working with data in this way, using streams. So it is easy to modify the _POST /friends_ endpoint to echo back the friend data that's been posted to the server.
